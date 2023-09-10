@@ -3,6 +3,7 @@ package com.gestao.absenteismo.models;
 import com.gestao.absenteismo.enums.Atuacao;
 import com.gestao.absenteismo.enums.Cargo;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -33,6 +34,6 @@ public class Gestor {
   private Cargo cargo;
   @Enumerated(EnumType.STRING)
   private Atuacao atuacao;
-  @OneToOne
-  private Contato contato; 
+  @OneToOne(cascade = CascadeType.ALL  , orphanRemoval = true)
+  private Contato contato;  
 }
