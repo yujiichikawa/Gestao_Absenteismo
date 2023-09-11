@@ -1,6 +1,7 @@
 package com.gestao.absenteismo.models;
 
 import java.io.Serializable;
+import java.util.List;
 
 import com.gestao.absenteismo.enums.Atuacao;
 
@@ -13,6 +14,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -32,12 +35,22 @@ public class Colaborador implements Serializable{
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private Atuacao atuacao;
+
   @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
   @JoinColumn(name = "id_contato",referencedColumnName = "id")
   private Contato contato;
+  
   @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
   @JoinColumn(name = "id_endereco",referencedColumnName = "id")
   private Endereco endereco;
+
+  @OneToMany
+  @JoinColumn(name = "id_comunicado",referencedColumnName = "id")
+  private List<Comunicado> comunicados;
+
+  @ManyToOne
+  @JoinColumn(name = "id_gestor",referencedColumnName = "id")
+  private Gestor gestor;
 
   public Colaborador() {
   }
@@ -80,6 +93,22 @@ public class Colaborador implements Serializable{
 
   public void setContato(Contato contato) {
     this.contato = contato;
+  }
+
+  public Endereco getEndereco() {
+    return endereco;
+  }
+  public void setEndereco(Endereco endereco) {
+    this.endereco = endereco;
+  }
+  public List<Comunicado> getComunicados() {
+    return comunicados;
+  }
+  public Gestor getGestor() {
+    return gestor;
+  }
+  public void setGestor(Gestor gestor) {
+    this.gestor = gestor;
   }
 
   @Override

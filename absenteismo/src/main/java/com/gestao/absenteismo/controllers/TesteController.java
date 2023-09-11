@@ -16,8 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gestao.absenteismo.dtos.ColaboradorRecord;
+import com.gestao.absenteismo.dtos.ComunicadoRecord;
 import com.gestao.absenteismo.dtos.GestorRecord;
+import com.gestao.absenteismo.models.Colaborador;
+import com.gestao.absenteismo.models.Comunicado;
 import com.gestao.absenteismo.models.Gestor;
+import com.gestao.absenteismo.repositories.ColaboradorRepository;
+import com.gestao.absenteismo.repositories.ComunicadoRepository;
 import com.gestao.absenteismo.repositories.GestorRepository;
 
 @RestController
@@ -25,7 +31,37 @@ import com.gestao.absenteismo.repositories.GestorRepository;
 public class TesteController {
   @Autowired
   private GestorRepository gestorRepository;
+  @Autowired
+  private ComunicadoRepository comunicadoRepository;
+  @Autowired
+  private ColaboradorRepository colaboradorRepository;
 
+  @GetMapping("/mensagem/all")
+  public ResponseEntity<Object> comunicadoAll(){
+    List<Comunicado> comunicados = comunicadoRepository.findAll();
+    if(comunicados.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body("Lista vazia");
+    return ResponseEntity.status(HttpStatus.OK).body(comunicados);
+  }
+
+  @PostMapping("/gestor/{id_gestor}/mensagem/enviar/{id_colaborador}")
+  public ResponseEntity<Object> comunicadoSave(@PathVariable(name = "id_gestor") Long id_gestor,
+  @PathVariable(name = "id_colaborador") Long id_colaborador, @RequestBody ComunicadoRecord comunicadoRecord){
+    Optional<Gestor> geOptional = gestorRepository.findById(id_gestor);
+    if(geOptional.isPresent()){
+      Optional<Colaborador> cOptional = colaboradorRepository.findById(id_colaborador);
+      if(cOptional.isPresent()){
+
+        var comunicado = new Comunicado();
+        BeanUtils.copyProperties(comunicadoRecord, comunicado);
+        comunicadoRepository.save(comunicado);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Criado");
+      }
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Colaborador não encontrado");
+    }
+    
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Gestor não reconhecido");
+    
+  }
   @PostMapping("/gestor/save")
   public ResponseEntity<Gestor> saveGestor(@RequestBody GestorRecord gestorRecord){
     var gestor = new Gestor();
@@ -64,5 +100,14 @@ public class TesteController {
     }
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado");
   } 
+
+  @PostMapping("/colaborador/save")
+  public ResponseEntity<Colaborador> save_colaborador(@RequestBody ColaboradorRecord colaboradorRecord){
+    var colaborador = new Colaborador();
+    BeanUtils.copyProperties(colaboradorRecord, colaborador);
+    return ResponseEntity.status(HttpStatus.CREATED).body(colaboradorRepository.save(colaborador));
+  }
+
+
 
 }
