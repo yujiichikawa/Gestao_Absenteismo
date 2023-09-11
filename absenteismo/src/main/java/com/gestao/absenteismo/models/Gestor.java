@@ -84,6 +84,13 @@ public class Gestor implements Serializable{
   public void setContato(Contato contato) {
     this.contato = contato;
   }
+  public Endereco getEndereco() {
+    return endereco;
+  }
+  public void setEndereco(Endereco endereco) {
+    this.endereco = endereco;
+  }
+  
   @Override
   public int hashCode() {
     final int prime = 31;

@@ -28,9 +28,9 @@ public class TesteController {
 
   @PostMapping("/gestor/save")
   public ResponseEntity<Gestor> saveGestor(@RequestBody GestorRecord gestorRecord){
-    var funcionario = new Gestor();
-    BeanUtils.copyProperties(gestorRecord, funcionario);
-    return ResponseEntity.status(HttpStatus.CREATED).body(gestorRepository.save(funcionario));
+    var gestor = new Gestor();
+    BeanUtils.copyProperties(gestorRecord, gestor);
+    return ResponseEntity.status(HttpStatus.CREATED).body(gestorRepository.save(gestor));
   }
 
   @GetMapping("/gestor/all")

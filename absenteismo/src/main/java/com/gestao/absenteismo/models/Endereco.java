@@ -31,8 +31,8 @@ public class Endereco implements Serializable{
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private TipoMoradia moradia;
-  @Column(nullable = false,length = 3)
-  private String numero;
+  @Column(nullable = false)
+  private Integer numero;
   
   public Endereco() {
   }
@@ -66,11 +66,10 @@ public class Endereco implements Serializable{
   public void setMoradia(TipoMoradia moradia) {
     this.moradia = moradia;
   }
-  public String getNumero() {
+  public Integer getNumero() {
     return numero;
   }
-  public void setNumero(String numero) {
+  public void setNumero(Integer numero) {
     this.numero = numero;
   }
-
 }
