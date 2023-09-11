@@ -19,8 +19,8 @@ import jakarta.persistence.Table;
 
 
 @Entity
-@Table(name = "funcionarios")
-public class Funcionario implements Serializable{
+@Table(name = "gestores")
+public class Gestor implements Serializable{
   private static final long serialVersionUID = 1L;
   
   @Id
@@ -32,14 +32,21 @@ public class Funcionario implements Serializable{
   @Column(unique = true,nullable = false,length = 11)
   private String cpf;
   @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
   private Cargo cargo;
   @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
   private Atuacao atuacao;
+
   @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
-  @JoinColumn(name = "id_contatos",referencedColumnName = "id")
+  @JoinColumn(name = "id_contato",referencedColumnName = "id")
   private Contato contato;
 
-  public Funcionario() {
+  @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
+  @JoinColumn(name = "id_endereco",referencedColumnName = "id")
+  private Endereco endereco;
+
+  public Gestor() {
   }
   public Long getId() {
     return id;
@@ -92,7 +99,7 @@ public class Funcionario implements Serializable{
       return false;
     if (getClass() != obj.getClass())
       return false;
-    Funcionario other = (Funcionario) obj;
+    Gestor other = (Gestor) obj;
     if (id == null) {
       if (other.id != null)
         return false;

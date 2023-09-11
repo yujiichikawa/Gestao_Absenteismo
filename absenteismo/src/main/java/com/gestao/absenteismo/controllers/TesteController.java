@@ -16,50 +16,50 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gestao.absenteismo.dtos.FuncionarioRecord;
-import com.gestao.absenteismo.models.Funcionario;
-import com.gestao.absenteismo.repositories.FuncionarioRepository;
+import com.gestao.absenteismo.dtos.GestorRecord;
+import com.gestao.absenteismo.models.Gestor;
+import com.gestao.absenteismo.repositories.GestorRepository;
 
 @RestController
 @RequestMapping("/teste")
 public class TesteController {
   @Autowired
-  private FuncionarioRepository funcionarioRepository;
+  private GestorRepository gestorRepository;
 
   @PostMapping("/gestor/save")
-  public ResponseEntity<Funcionario> saveGestor(@RequestBody FuncionarioRecord funcionarioRecord){
-    var funcionario = new Funcionario();
-    BeanUtils.copyProperties(funcionarioRecord, funcionario);
-    return ResponseEntity.status(HttpStatus.CREATED).body(funcionarioRepository.save(funcionario));
+  public ResponseEntity<Gestor> saveGestor(@RequestBody GestorRecord gestorRecord){
+    var funcionario = new Gestor();
+    BeanUtils.copyProperties(gestorRecord, funcionario);
+    return ResponseEntity.status(HttpStatus.CREATED).body(gestorRepository.save(funcionario));
   }
 
   @GetMapping("/gestor/all")
-  public ResponseEntity<List<Funcionario>> listall(){
-    return ResponseEntity.status(HttpStatus.OK).body(funcionarioRepository.findAll());
+  public ResponseEntity<List<Gestor>> listall(){
+    return ResponseEntity.status(HttpStatus.OK).body(gestorRepository.findAll());
   }
 
   @GetMapping("/gestor/{id}")
   public ResponseEntity<Object> listById(@PathVariable Long id){
-    Optional<Funcionario> fuOptional = funcionarioRepository.findById(id);
+    Optional<Gestor> fuOptional = gestorRepository.findById(id);
     if(fuOptional.isPresent()) {return ResponseEntity.status(HttpStatus.OK).body(fuOptional);}
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado");
     
   }
 
   @PutMapping("/gestor/update/{id}")
-  public ResponseEntity<Object> updateById(@PathVariable Long id,@RequestBody FuncionarioRecord funcionarioRecord){
-    Optional<Funcionario> funcionario = funcionarioRepository.findById(id);
+  public ResponseEntity<Object> updateById(@PathVariable Long id,@RequestBody GestorRecord gestorRecord){
+    Optional<Gestor> funcionario = gestorRepository.findById(id);
     if(funcionario.isEmpty()) {return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado");}
     var funcionarioModel = funcionario.get();
-    BeanUtils.copyProperties(funcionarioRecord, funcionarioModel);
-    return ResponseEntity.status(HttpStatus.OK).body(funcionarioRepository.save(funcionarioModel));
+    BeanUtils.copyProperties(gestorRecord, funcionarioModel);
+    return ResponseEntity.status(HttpStatus.OK).body(gestorRepository.save(funcionarioModel));
   }
 
   @DeleteMapping("/gestor/delete/{id}")
   public ResponseEntity<Object> deleteGestor(@PathVariable Long id){
-    Optional<Funcionario> funcionario = funcionarioRepository.findById(id);
+    Optional<Gestor> funcionario = gestorRepository.findById(id);
     if(funcionario.isPresent()) {
-      funcionarioRepository.delete(funcionario.get());
+      gestorRepository.delete(funcionario.get());
       return ResponseEntity.status(HttpStatus.OK).body("Gerente removido");
     }
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado");

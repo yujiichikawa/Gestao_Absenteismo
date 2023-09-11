@@ -2,7 +2,7 @@ package com.gestao.absenteismo.enums;
 
 public enum Cargo {
   GERENTE_DE_EQUIPE("Gerente de Equipe"),
-  COLABORADOR("Colaborador");
+  SUPERVISOR_DE_DEPARTAMENTO("Supervisor de Departamento");
 
   private String cargo;
   Cargo(String cargo){
