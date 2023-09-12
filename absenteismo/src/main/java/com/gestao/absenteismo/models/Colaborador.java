@@ -1,8 +1,11 @@
 package com.gestao.absenteismo.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gestao.absenteismo.enums.Atuacao;
 
 import jakarta.persistence.CascadeType;
@@ -44,15 +47,18 @@ public class Colaborador implements Serializable{
   @JoinColumn(name = "id_endereco",referencedColumnName = "id")
   private Endereco endereco;
 
-  @OneToMany
+  @JsonManagedReference
+  @OneToMany(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "id_comunicado",referencedColumnName = "id")
   private List<Comunicado> comunicados;
 
-  @ManyToOne
+  @JsonBackReference
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "id_gestor",referencedColumnName = "id")
   private Gestor gestor;
 
   public Colaborador() {
+    this.comunicados = new ArrayList<Comunicado>();
   }
 
   public Long getId() {
@@ -109,6 +115,9 @@ public class Colaborador implements Serializable{
   }
   public void setGestor(Gestor gestor) {
     this.gestor = gestor;
+  }
+  public void setComunicados(Comunicado comunicado) {
+    this.comunicados.add(comunicado);
   }
 
   @Override

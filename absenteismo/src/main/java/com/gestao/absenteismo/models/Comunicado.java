@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gestao.absenteismo.enums.TipoComunicado;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -31,14 +33,16 @@ public class Comunicado implements Serializable{
   private TipoComunicado tipo;
   @Column(nullable = false,length = 500)
   private String mensagem;
-  @Column
+
   private LocalDate data;
-  @Column
   private LocalTime hora;
-  @ManyToOne
+  
+  @JsonBackReference
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "id_gestor",referencedColumnName = "id")
   private Gestor gestor;
-  @ManyToOne
+  @JsonBackReference
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "id_colaborador",referencedColumnName = "id")
   private Colaborador colaborador;
 

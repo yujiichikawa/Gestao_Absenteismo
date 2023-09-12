@@ -1,8 +1,10 @@
 package com.gestao.absenteismo.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gestao.absenteismo.enums.Atuacao;
 import com.gestao.absenteismo.enums.Cargo;
 
@@ -15,7 +17,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -49,15 +50,19 @@ public class Gestor implements Serializable{
   @JoinColumn(name = "id_endereco",referencedColumnName = "id")
   private Endereco endereco;
 
-  @OneToMany
+  @JsonManagedReference
+  @OneToMany(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "id_comunicado",referencedColumnName = "id")
   private List<Comunicado> comunicados;
 
-  @OneToMany
+  @JsonManagedReference
+  @OneToMany(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "id_colaborador",referencedColumnName = "id")
   private List<Colaborador> colaboradores;
 
   public Gestor() {
+    this.comunicados = new ArrayList<Comunicado>();
+    this.colaboradores = new ArrayList<Colaborador>();
   }
   public Long getId() {
     return id;
@@ -106,6 +111,12 @@ public class Gestor implements Serializable{
   }
   public List<Colaborador> getColaboradores() {
     return colaboradores;
+  }
+  public void setColaboradores(Colaborador colaborador) {
+    this.colaboradores.add(colaborador);
+  }
+  public void setComunicados(Comunicado comunicado) {
+    this.comunicados.add(comunicado);
   }
 
   @Override

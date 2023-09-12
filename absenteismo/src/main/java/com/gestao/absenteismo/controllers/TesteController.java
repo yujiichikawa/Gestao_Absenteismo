@@ -50,9 +50,15 @@ public class TesteController {
     if(geOptional.isPresent()){
       Optional<Colaborador> cOptional = colaboradorRepository.findById(id_colaborador);
       if(cOptional.isPresent()){
-
+        var gestor = geOptional.get();
         var comunicado = new Comunicado();
+        var colaborador = cOptional.get();
+        
         BeanUtils.copyProperties(comunicadoRecord, comunicado);
+
+        comunicado.setGestor(gestor);
+        comunicado.setColaborador(colaborador);
+        
         comunicadoRepository.save(comunicado);
         return ResponseEntity.status(HttpStatus.CREATED).body("Criado");
       }
@@ -101,11 +107,21 @@ public class TesteController {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado");
   } 
 
-  @PostMapping("/colaborador/save")
-  public ResponseEntity<Colaborador> save_colaborador(@RequestBody ColaboradorRecord colaboradorRecord){
-    var colaborador = new Colaborador();
-    BeanUtils.copyProperties(colaboradorRecord, colaborador);
-    return ResponseEntity.status(HttpStatus.CREATED).body(colaboradorRepository.save(colaborador));
+  @PostMapping("/gestor/{id}/colaborador/save")
+  public ResponseEntity<Object> save_colaborador(@PathVariable Long id,   @RequestBody ColaboradorRecord colaboradorRecord){
+    var gestor = gestorRepository.findById(id);
+    if(gestor.isPresent()){
+      var colaborador = new Colaborador();
+      var gestorconvert = gestor.get();
+
+      BeanUtils.copyProperties(colaboradorRecord, colaborador);
+
+      gestorconvert.setColaboradores(colaborador);
+      colaborador.setGestor(gestorconvert);
+
+      return ResponseEntity.status(HttpStatus.CREATED).body(colaboradorRepository.save(colaborador));
+    }
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Gestor não existente");
   }
 
 
