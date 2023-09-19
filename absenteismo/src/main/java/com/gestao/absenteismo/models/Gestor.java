@@ -1,12 +1,12 @@
 package com.gestao.absenteismo.models;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gestao.absenteismo.enums.Atuacao;
 import com.gestao.absenteismo.enums.Cargo;
+import com.gestao.absenteismo.enums.TipoMoradia;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -16,17 +16,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 
 @Entity
 @Table(name = "gestores")
-public class Gestor implements Serializable{
-  private static final long serialVersionUID = 1L;
-  
+public class Gestor{
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
@@ -41,82 +38,90 @@ public class Gestor implements Serializable{
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private Atuacao atuacao;
+  @Column(nullable = false,length = 11)
+  private String telefone;
+  @Column(nullable = false,length = 50)
+  private String email;
+  @Column(nullable = false,length = 50)
+  private String cidade;
+  @Column(nullable = false,length = 50)
+  private String bairro;
+  @Column(nullable = false,length = 50)
+  private String rua;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private TipoMoradia moradia;
+  @Column(nullable = false)
+  private Integer numero;
 
-  @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
-  @JoinColumn(name = "id_contato",referencedColumnName = "id")
-  private Contato contato;
-
-  @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
-  @JoinColumn(name = "id_endereco",referencedColumnName = "id")
-  private Endereco endereco;
 
   @JsonManagedReference
-  @OneToMany(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "id_comunicado",referencedColumnName = "id")
+  @OneToMany(mappedBy = "gestor",cascade = CascadeType.PERSIST)
   private List<Comunicado> comunicados;
 
   @JsonManagedReference
-  @OneToMany(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "id_colaborador",referencedColumnName = "id")
+  @OneToMany(mappedBy = "gestor",cascade = CascadeType.PERSIST)
   private List<Colaborador> colaboradores;
 
   public Gestor() {
     this.comunicados = new ArrayList<Comunicado>();
     this.colaboradores = new ArrayList<Colaborador>();
   }
+
   public Long getId() {
     return id;
   }
+
   public void setId(Long id) {
     this.id = id;
   }
+
   public String getNome() {
     return nome;
   }
+
   public void setNome(String nome) {
     this.nome = nome;
   }
+
   public String getCpf() {
     return cpf;
   }
+
   public void setCpf(String cpf) {
     this.cpf = cpf;
   }
+
   public Cargo getCargo() {
     return cargo;
   }
+
   public void setCargo(Cargo cargo) {
     this.cargo = cargo;
   }
+
   public Atuacao getAtuacao() {
     return atuacao;
   }
+
   public void setAtuacao(Atuacao atuacao) {
     this.atuacao = atuacao;
   }
-  public Contato getContato() {
-    return contato;
-  }
-  public void setContato(Contato contato) {
-    this.contato = contato;
-  }
-  public Endereco getEndereco() {
-    return endereco;
-  }
-  public void setEndereco(Endereco endereco) {
-    this.endereco = endereco;
-  }
+
   public List<Comunicado> getComunicados() {
     return comunicados;
   }
+
+  public void setComunicados(Comunicado comunicado) {
+    this.comunicados.add(comunicado);
+  }
+
   public List<Colaborador> getColaboradores() {
     return colaboradores;
   }
+
   public void setColaboradores(Colaborador colaborador) {
     this.colaboradores.add(colaborador);
-  }
-  public void setComunicados(Comunicado comunicado) {
-    this.comunicados.add(comunicado);
   }
 
   @Override
@@ -126,6 +131,7 @@ public class Gestor implements Serializable{
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     return result;
   }
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -142,6 +148,7 @@ public class Gestor implements Serializable{
       return false;
     return true;
   }
-
   
+
+
 }

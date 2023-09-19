@@ -1,12 +1,12 @@
 package com.gestao.absenteismo.models;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gestao.absenteismo.enums.Atuacao;
+import com.gestao.absenteismo.enums.TipoMoradia;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -19,13 +19,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "colaboradores")
-public class Colaborador implements Serializable{
-  private static final long serialVersionUID = 1L;
+public class Colaborador{
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,18 +36,24 @@ public class Colaborador implements Serializable{
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private Atuacao atuacao;
-
-  @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
-  @JoinColumn(name = "id_contato",referencedColumnName = "id")
-  private Contato contato;
-  
-  @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
-  @JoinColumn(name = "id_endereco",referencedColumnName = "id")
-  private Endereco endereco;
+  @Column(nullable = false,length = 11)
+  private String telefone;
+  @Column(nullable = false,length = 50)
+  private String email;
+  @Column(nullable = false,length = 50)
+  private String cidade;
+  @Column(nullable = false,length = 50)
+  private String bairro;
+  @Column(nullable = false,length = 50)
+  private String rua;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private TipoMoradia moradia;
+  @Column(nullable = false)
+  private Integer numero;
 
   @JsonManagedReference
-  @OneToMany(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "id_comunicado",referencedColumnName = "id")
+  @OneToMany(mappedBy = "colaborador",cascade = CascadeType.PERSIST)
   private List<Comunicado> comunicados;
 
   @JsonBackReference
@@ -93,31 +97,20 @@ public class Colaborador implements Serializable{
     this.atuacao = atuacao;
   }
 
-  public Contato getContato() {
-    return contato;
-  }
-
-  public void setContato(Contato contato) {
-    this.contato = contato;
-  }
-
-  public Endereco getEndereco() {
-    return endereco;
-  }
-  public void setEndereco(Endereco endereco) {
-    this.endereco = endereco;
-  }
   public List<Comunicado> getComunicados() {
     return comunicados;
   }
+
+  public void setComunicados(Comunicado comunicado) {
+    this.comunicados.add(comunicado);
+  }
+
   public Gestor getGestor() {
     return gestor;
   }
+
   public void setGestor(Gestor gestor) {
     this.gestor = gestor;
-  }
-  public void setComunicados(Comunicado comunicado) {
-    this.comunicados.add(comunicado);
   }
 
   @Override
@@ -145,5 +138,6 @@ public class Colaborador implements Serializable{
     return true;
   }
 
+  
   
 }

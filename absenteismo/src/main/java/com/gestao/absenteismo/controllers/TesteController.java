@@ -55,9 +55,11 @@ public class TesteController {
         var colaborador = cOptional.get();
         
         BeanUtils.copyProperties(comunicadoRecord, comunicado);
-
+        gestor.setComunicados(comunicado);
+        colaborador.setComunicados(comunicado);
         comunicado.setGestor(gestor);
         comunicado.setColaborador(colaborador);
+
         
         comunicadoRepository.save(comunicado);
         return ResponseEntity.status(HttpStatus.CREATED).body("Criado");
@@ -71,6 +73,7 @@ public class TesteController {
   @PostMapping("/gestor/save")
   public ResponseEntity<Gestor> saveGestor(@RequestBody GestorRecord gestorRecord){
     var gestor = new Gestor();
+    
     BeanUtils.copyProperties(gestorRecord, gestor);
     return ResponseEntity.status(HttpStatus.CREATED).body(gestorRepository.save(gestor));
   }
