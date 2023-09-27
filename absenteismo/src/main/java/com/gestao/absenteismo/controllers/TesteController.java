@@ -59,7 +59,6 @@ public class TesteController {
         colaborador.setComunicados(comunicado);
         comunicado.setGestor(gestor);
         comunicado.setColaborador(colaborador);
-
         
         comunicadoRepository.save(comunicado);
         return ResponseEntity.status(HttpStatus.CREATED).body("Criado");
