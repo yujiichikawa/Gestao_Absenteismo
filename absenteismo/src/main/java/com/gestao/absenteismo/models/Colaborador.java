@@ -46,7 +46,7 @@ public class Colaborador{
   private Endereco endereco;
 
   @JsonManagedReference
-  @OneToMany(mappedBy = "colaborador",cascade = CascadeType.PERSIST)
+  @OneToMany(mappedBy = "colaborador",cascade = CascadeType.REMOVE)
   private List<Comunicado> comunicados;
 
   @JsonBackReference

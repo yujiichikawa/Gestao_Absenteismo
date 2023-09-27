@@ -49,4 +49,15 @@ public class ColaboradorController {
     BeanUtils.copyProperties(colaboradorRecord, funcionarioModel);
     return ResponseEntity.status(HttpStatus.OK).body(colaboradorRepository.save(funcionarioModel));
   }
+
+  @GetMapping("/{id}/mensagens")
+  public ResponseEntity<Object> all_mensagens(@PathVariable
+   Long id){
+    var colaborador = colaboradorRepository.findById(id);
+    if(colaborador.isPresent()){
+      return ResponseEntity.status(HttpStatus.OK).body(colaborador.get().getComunicados());
+    }
+    return ResponseEntity.status(HttpStatus.OK).body("Colaborador nao existente");
+  }
+  
 }
