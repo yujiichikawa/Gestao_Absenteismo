@@ -24,6 +24,8 @@ import com.gestao.absenteismo.models.Comunicado;
 import com.gestao.absenteismo.models.Gestor;
 import com.gestao.absenteismo.repositories.ColaboradorRepository;
 import com.gestao.absenteismo.repositories.ComunicadoRepository;
+import com.gestao.absenteismo.repositories.ContatoRepository;
+import com.gestao.absenteismo.repositories.EnderecoRepository;
 import com.gestao.absenteismo.repositories.GestorRepository;
 
 @RestController
@@ -35,7 +37,11 @@ public class TesteController {
   private ComunicadoRepository comunicadoRepository;
   @Autowired
   private ColaboradorRepository colaboradorRepository;
-
+  @Autowired
+  private ContatoRepository contatoRepository;
+  @Autowired
+  private EnderecoRepository enderecoRepository;
+  
   @GetMapping("/mensagem/all")
   public ResponseEntity<Object> comunicadoAll(){
     List<Comunicado> comunicados = comunicadoRepository.findAll();
@@ -69,12 +75,14 @@ public class TesteController {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Gestor não reconhecido");
     
   }
-  
+
   @PostMapping("/gestor/save")
   public ResponseEntity<Gestor> saveGestor(@RequestBody GestorRecord gestorRecord){
     var gestor = new Gestor();
-    
+
     BeanUtils.copyProperties(gestorRecord, gestor);
+    enderecoRepository.save(gestor.getEndereco());
+    contatoRepository.save(gestor.getContato());
     return ResponseEntity.status(HttpStatus.CREATED).body(gestorRepository.save(gestor));
   }
 
@@ -121,7 +129,8 @@ public class TesteController {
 
       gestorconvert.setColaboradores(colaborador);
       colaborador.setGestor(gestorconvert);
-
+      contatoRepository.save(colaborador.getContato());
+      enderecoRepository.save(colaborador.getEndereco());
       return ResponseEntity.status(HttpStatus.CREATED).body(colaboradorRepository.save(colaborador));
     }
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Gestor não existente");

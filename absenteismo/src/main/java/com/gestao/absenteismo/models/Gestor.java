@@ -40,11 +40,10 @@ public class Gestor{
   @Column(nullable = false)
   private Atuacao atuacao;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "id_contato",referencedColumnName = "id")
   private Contato contato;
-
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "id_endereco",referencedColumnName = "id")
   private Endereco endereco;
 
