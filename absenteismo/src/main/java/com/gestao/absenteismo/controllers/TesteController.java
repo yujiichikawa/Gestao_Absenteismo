@@ -69,6 +69,7 @@ public class TesteController {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Gestor não reconhecido");
     
   }
+  
   @PostMapping("/gestor/save")
   public ResponseEntity<Gestor> saveGestor(@RequestBody GestorRecord gestorRecord){
     var gestor = new Gestor();

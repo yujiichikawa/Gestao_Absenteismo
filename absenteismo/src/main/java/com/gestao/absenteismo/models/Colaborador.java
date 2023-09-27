@@ -6,7 +6,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gestao.absenteismo.enums.Atuacao;
-import com.gestao.absenteismo.enums.TipoMoradia;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -19,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -36,21 +36,14 @@ public class Colaborador{
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private Atuacao atuacao;
-  @Column(nullable = false,length = 11)
-  private String telefone;
-  @Column(nullable = false,length = 50)
-  private String email;
-  @Column(nullable = false,length = 50)
-  private String cidade;
-  @Column(nullable = false,length = 50)
-  private String bairro;
-  @Column(nullable = false,length = 50)
-  private String rua;
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private TipoMoradia moradia;
-  @Column(nullable = false)
-  private Integer numero;
+
+  @OneToOne
+  @JoinColumn(name = "id_contato",referencedColumnName = "id")
+  private Contato contato;
+
+  @OneToOne
+  @JoinColumn(name = "id_endereco",referencedColumnName = "id")
+  private Endereco endereco;
 
   @JsonManagedReference
   @OneToMany(mappedBy = "colaborador",cascade = CascadeType.PERSIST)
@@ -111,6 +104,23 @@ public class Colaborador{
 
   public void setGestor(Gestor gestor) {
     this.gestor = gestor;
+  }
+  
+
+  public Contato getContato() {
+    return contato;
+  }
+
+  public void setContato(Contato contato) {
+    this.contato = contato;
+  }
+
+  public Endereco getEndereco() {
+    return endereco;
+  }
+
+  public void setEndereco(Endereco endereco) {
+    this.endereco = endereco;
   }
 
   @Override
