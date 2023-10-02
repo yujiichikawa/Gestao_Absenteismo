@@ -38,6 +38,10 @@ public class Colaborador{
   private Atuacao atuacao;
 
   @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "id_contrato",referencedColumnName = "id")
+  private Contrato contrato;
+
+  @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "id_contato",referencedColumnName = "id")
   private Contato contato;
 
@@ -49,13 +53,18 @@ public class Colaborador{
   @OneToMany(mappedBy = "colaborador",cascade = CascadeType.REMOVE)
   private List<Comunicado> comunicados;
 
+  @JsonManagedReference
+  @OneToMany(mappedBy = "colaborador",cascade = CascadeType.REMOVE)
+  private List<Registro_Presenca> registro_presencas;
+
   @JsonBackReference
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "id_gestor",referencedColumnName = "id")
   private Gestor gestor;
 
   public Colaborador() {
-    this.comunicados = new ArrayList<Comunicado>();
+    comunicados = new ArrayList<Comunicado>();
+    registro_presencas = new ArrayList<Registro_Presenca>();
   }
 
   public Long getId() {
@@ -122,6 +131,18 @@ public class Colaborador{
   public void setEndereco(Endereco endereco) {
     this.endereco = endereco;
   }
+  public Contrato getContrato() {
+    return contrato;
+  }
+  public void setContrato(Contrato contrato) {
+    this.contrato = contrato;
+  }
+  public List<Registro_Presenca> getRegistro_presencas() {
+    return registro_presencas;
+  }
+  public void setRegistro_presenca(Registro_Presenca registro_presenca) {
+    this.registro_presencas.add(registro_presenca);
+  }
 
   @Override
   public int hashCode() {
@@ -147,7 +168,5 @@ public class Colaborador{
       return false;
     return true;
   }
-
-  
   
 }

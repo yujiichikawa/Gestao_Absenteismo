@@ -122,7 +122,5 @@ public class GestorController {
     }
     
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Gestor não reconhecido");
-    
   }
-
 }

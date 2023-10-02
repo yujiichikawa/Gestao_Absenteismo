@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gestao.absenteismo.enums.Atuacao;
-import com.gestao.absenteismo.enums.Cargo;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -35,10 +34,11 @@ public class Gestor{
   private String cpf;
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private Cargo cargo;
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
   private Atuacao atuacao;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "id_contrato",referencedColumnName = "id")
+  private Contrato contrato;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "id_contato",referencedColumnName = "id")
@@ -84,14 +84,6 @@ public class Gestor{
     this.cpf = cpf;
   }
 
-  public Cargo getCargo() {
-    return cargo;
-  }
-
-  public void setCargo(Cargo cargo) {
-    this.cargo = cargo;
-  }
-
   public Atuacao getAtuacao() {
     return atuacao;
   }
@@ -130,6 +122,13 @@ public class Gestor{
 
   public void setEndereco(Endereco endereco) {
     this.endereco = endereco;
+  }
+
+  public Contrato getContrato() {
+    return contrato;
+  }
+  public void setContrato(Contrato contrato) {
+    this.contrato = contrato;
   }
 
   @Override

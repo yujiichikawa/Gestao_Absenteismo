@@ -17,13 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gestao.absenteismo.dtos.ColaboradorRecord;
 import com.gestao.absenteismo.models.Colaborador;
+import com.gestao.absenteismo.models.Registro_Presenca;
 import com.gestao.absenteismo.repositories.ColaboradorRepository;
+import com.gestao.absenteismo.services.RegistroPresencaService;
 
 @RestController
 @RequestMapping("/colaborador")
 public class ColaboradorController {
   @Autowired
   private ColaboradorRepository colaboradorRepository;
+  @Autowired
+  private RegistroPresencaService registroPresencaService;
 
   @DeleteMapping("/delete/{id}")
    public ResponseEntity<Object> deleteGestor(@PathVariable Long id){
@@ -60,4 +64,8 @@ public class ColaboradorController {
     return ResponseEntity.status(HttpStatus.OK).body("Colaborador nao existente");
   }
   
+  @GetMapping("/presenca/{id}")
+  public ResponseEntity<Registro_Presenca> presenca_colaborador(@PathVariable Long id){  
+    return ResponseEntity.status(HttpStatus.OK).body(registroPresencaService.gerar_presenca_colaborador(id));
+  }
 }
