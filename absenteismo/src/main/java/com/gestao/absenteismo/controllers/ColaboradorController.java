@@ -64,8 +64,8 @@ public class ColaboradorController {
     return ResponseEntity.status(HttpStatus.OK).body("Colaborador nao existente");
   }
   
-  @GetMapping("/presenca/{id}")
-  public ResponseEntity<Registro_Presenca> presenca_colaborador(@PathVariable Long id){  
-    return ResponseEntity.status(HttpStatus.OK).body(registroPresencaService.gerar_presenca_colaborador(id));
+  @GetMapping("/presenca/{cpf}")
+  public ResponseEntity<Registro_Presenca> presenca_colaborador(@PathVariable String cpf){  
+    return ResponseEntity.status(HttpStatus.OK).body(registroPresencaService.gerar_presenca_colaborador(cpf));
   }
 }
