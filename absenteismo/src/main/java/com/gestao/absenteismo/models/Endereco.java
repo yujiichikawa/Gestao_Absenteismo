@@ -10,6 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "enderecos")
@@ -18,23 +20,26 @@ public class Endereco {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
   private Long id;
+  @NotBlank
   @Column(nullable = false,length = 50)
   private String cidade;
+  @NotBlank
   @Column(nullable = false,length = 50)
   private String bairro;
+  @NotBlank
   @Column(nullable = false,length = 50)
   private String rua;
+  @NotNull
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private TipoMoradia moradia;
+  @NotBlank
   @Column(nullable = false)
-  private Integer numero;
+  private String numero;
   
   public Endereco() {
   }
-  public Long getId() {
-    return id;
-  }
+
   public void setId(Long id) {
     this.id = id;
   }
@@ -62,10 +67,10 @@ public class Endereco {
   public void setMoradia(TipoMoradia moradia) {
     this.moradia = moradia;
   }
-  public Integer getNumero() {
+  public String getNumero() {
     return numero;
   }
-  public void setNumero(Integer numero) {
+  public void setNumero(String numero) {
     this.numero = numero;
   }
   

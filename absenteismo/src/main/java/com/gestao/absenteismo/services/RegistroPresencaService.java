@@ -14,8 +14,8 @@ public class RegistroPresencaService {
   @Autowired
   private RegistroPresencaRepository registroPresencaRepository;
 
-  public Registro_Presenca gerar_presenca_colaborador(Long id){  
-    var colaborador = colaboradorRepository.findById(id);
+  public Registro_Presenca gerar_presenca_colaborador(String cpf){  
+    var colaborador = colaboradorRepository.findByCpf(cpf);
     var presenca = new Registro_Presenca();
     colaborador.get().setRegistro_presenca(presenca);
     presenca.setColaborador(colaborador.get());

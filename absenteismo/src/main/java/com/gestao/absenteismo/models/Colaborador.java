@@ -67,10 +67,6 @@ public class Colaborador{
     registro_presencas = new ArrayList<Registro_Presenca>();
   }
 
-  public Long getId() {
-    return id;
-  }
-
   public void setId(Long id) {
     this.id = id;
   }

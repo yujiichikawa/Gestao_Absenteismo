@@ -16,9 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gestao.absenteismo.dtos.ColaboradorRecord;
-import com.gestao.absenteismo.dtos.ComunicadoRecord;
-import com.gestao.absenteismo.dtos.GestorRecord;
+import com.gestao.absenteismo.dtos.ComunicadoDTO;
+import com.gestao.absenteismo.dtos.FuncionarioDTO;
 import com.gestao.absenteismo.models.Colaborador;
 import com.gestao.absenteismo.models.Comunicado;
 import com.gestao.absenteismo.models.Gestor;
@@ -27,6 +26,8 @@ import com.gestao.absenteismo.repositories.ComunicadoRepository;
 import com.gestao.absenteismo.repositories.ContatoRepository;
 import com.gestao.absenteismo.repositories.EnderecoRepository;
 import com.gestao.absenteismo.repositories.GestorRepository;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/gestor")
@@ -43,22 +44,22 @@ public class GestorController {
   private ComunicadoRepository comunicadoRepository;
 
   @PostMapping("/cadastro")
-  public ResponseEntity<Gestor> cadastro_gestor(@RequestBody GestorRecord gestorRecord){
+  public ResponseEntity<Gestor> cadastro_gestor(@Valid @RequestBody FuncionarioDTO funcionarioDTO){
     var gestor = new Gestor();
-    BeanUtils.copyProperties(gestorRecord, gestor);
+    BeanUtils.copyProperties(funcionarioDTO, gestor);
     enderecoRepository.save(gestor.getEndereco());
     contatoRepository.save(gestor.getContato());
     return ResponseEntity.status(HttpStatus.CREATED).body(gestorRepository.save(gestor));
   }
 
-  @PostMapping("/{id}/colaborador/cadastro")
-  public ResponseEntity<Object> cadastro_colaborador(@PathVariable Long id,@RequestBody ColaboradorRecord colaboradorRecord){
-    var gestor = gestorRepository.findById(id);
+  @PostMapping("/{cpf}/colaborador/cadastro")
+  public ResponseEntity<Object> cadastro_colaborador(@PathVariable String cpf,@Valid @RequestBody FuncionarioDTO funcionarioDTO){
+    var gestor = gestorRepository.findByCpf(cpf);
     if(gestor.isPresent()){
       var colaborador = new Colaborador();
       var gestorconvert = gestor.get();
 
-      BeanUtils.copyProperties(colaboradorRecord, colaborador);
+      BeanUtils.copyProperties(funcionarioDTO, colaborador);
 
       gestorconvert.setColaboradores(colaborador);
       colaborador.setGestor(gestorconvert);
@@ -75,18 +76,18 @@ public class GestorController {
     return ResponseEntity.status(HttpStatus.OK).body(gestorRepository.findAll());
   }
 
-  @PutMapping("/update/{id}")
-  public ResponseEntity<Object> updateById(@PathVariable Long id,@RequestBody GestorRecord gestorRecord){
-    Optional<Gestor> funcionario = gestorRepository.findById(id);
+  @PutMapping("/update/{cpf}")
+  public ResponseEntity<Object> updateById(@PathVariable String cpf,@Valid @RequestBody FuncionarioDTO funcionarioDTO){
+    Optional<Gestor> funcionario = gestorRepository.findByCpf(cpf);
     if(funcionario.isEmpty()) {return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado");}
     var funcionarioModel = funcionario.get();
-    BeanUtils.copyProperties(gestorRecord, funcionarioModel);
+    BeanUtils.copyProperties(funcionarioDTO, funcionarioModel);
     return ResponseEntity.status(HttpStatus.OK).body(gestorRepository.save(funcionarioModel));
   }
 
-  @DeleteMapping("/delete/{id}")
-  public ResponseEntity<Object> deleteGestor(@PathVariable Long id){
-    Optional<Gestor> funcionario = gestorRepository.findById(id);
+  @DeleteMapping("/delete/{cpf}")
+  public ResponseEntity<Object> deleteGestor(@PathVariable String cpf){
+    Optional<Gestor> funcionario = gestorRepository.findByCpf(cpf);
     if(funcionario.isPresent()) {
       if(funcionario.get().getColaboradores().isEmpty()){
         gestorRepository.delete(funcionario.get());
@@ -97,18 +98,18 @@ public class GestorController {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado");
   } 
 
-  @PostMapping("/{id_gestor}/mensagem/enviar/{id_colaborador}")
-  public ResponseEntity<Object> comunicadoSave(@PathVariable(name = "id_gestor") Long id_gestor,
-  @PathVariable(name = "id_colaborador") Long id_colaborador, @RequestBody ComunicadoRecord comunicadoRecord){
-    Optional<Gestor> geOptional = gestorRepository.findById(id_gestor);
+  @PostMapping("/{cpf_gestor}/mensagem/enviar/{cpf_colaborador}")
+  public ResponseEntity<Object> comunicadoSave(@PathVariable(name = "cpf_gestor") String cpf_gestor,
+  @PathVariable(name = "cpf_colaborador") String cpf_colaborador,@Valid @RequestBody ComunicadoDTO comunicadoDTO){
+    Optional<Gestor> geOptional = gestorRepository.findByCpf(cpf_gestor);
     if(geOptional.isPresent()){
-      Optional<Colaborador> cOptional = colaboradorRepository.findById(id_colaborador);
+      Optional<Colaborador> cOptional = colaboradorRepository.findByCpf(cpf_colaborador);
       if(cOptional.isPresent()){
         var gestor = geOptional.get();
         var comunicado = new Comunicado();
         var colaborador = cOptional.get();
         
-        BeanUtils.copyProperties(comunicadoRecord, comunicado);
+        BeanUtils.copyProperties(comunicadoDTO, comunicado);
 
         gestor.setComunicados(comunicado);
         colaborador.setComunicados(comunicado);

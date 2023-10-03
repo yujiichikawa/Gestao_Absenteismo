@@ -14,6 +14,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "contratos")
@@ -22,27 +26,31 @@ public class Contrato {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
   private Long id;
+  @NotNull
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private Cargo cargo;
+  @NotNull
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private Atuacao atuacao;
+  @NotBlank
   @Column(nullable = false,length = 1000)
   private String descricao;
 
+  @NotNull
+  @FutureOrPresent
   @JsonFormat(shape = JsonFormat.Shape.STRING,pattern="dd-MM-yyyy")
   @Column(nullable = false)
   private LocalDate data_inicio;
+
+  @NotNull
+  @Future
   @JsonFormat(shape = JsonFormat.Shape.STRING,pattern="dd-MM-yyyy")
   @Column(nullable = false)
   private LocalDate data_termino;
 
   public Contrato() {
-  }
-
-  public Long getId() {
-    return id;
   }
 
   public void setId(Long id) {

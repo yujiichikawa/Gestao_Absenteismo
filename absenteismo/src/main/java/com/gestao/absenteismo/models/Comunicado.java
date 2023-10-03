@@ -51,10 +51,6 @@ public class Comunicado implements Serializable{
     this.hora = LocalTime.now();
   }
 
-  public Long getId() {
-    return id;
-  }
-
   public void setId(Long id) {
     this.id = id;
   }

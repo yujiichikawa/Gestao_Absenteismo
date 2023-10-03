@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gestao.absenteismo.dtos.ColaboradorRecord;
+import com.gestao.absenteismo.dtos.FuncionarioDTO;
 import com.gestao.absenteismo.models.Colaborador;
 import com.gestao.absenteismo.models.Registro_Presenca;
 import com.gestao.absenteismo.repositories.ColaboradorRepository;
 import com.gestao.absenteismo.services.RegistroPresencaService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/colaborador")
@@ -29,9 +31,9 @@ public class ColaboradorController {
   @Autowired
   private RegistroPresencaService registroPresencaService;
 
-  @DeleteMapping("/delete/{id}")
-   public ResponseEntity<Object> deleteGestor(@PathVariable Long id){
-    Optional<Colaborador> funcionario = colaboradorRepository.findById(id);
+  @DeleteMapping("/delete/{cpf}")
+   public ResponseEntity<Object> deleteGestor(@PathVariable String cpf){
+    Optional<Colaborador> funcionario = colaboradorRepository.findByCpf(cpf);
     if(funcionario.isPresent()) {
       colaboradorRepository.delete(funcionario.get());
       return ResponseEntity.status(HttpStatus.OK).body("Colaborador removido");
@@ -43,21 +45,21 @@ public class ColaboradorController {
     return ResponseEntity.status(HttpStatus.OK).body(colaboradorRepository.findAll());
   }
 
-  @PutMapping("/update/{id}")
-  public ResponseEntity<Object> updateById(@PathVariable Long id,@RequestBody ColaboradorRecord colaboradorRecord){
-    Optional<Colaborador> funcionario = colaboradorRepository.findById(id);
+  @PutMapping("/update/{cpf}")
+  public ResponseEntity<Object> updateById(@PathVariable String cpf,@Valid @RequestBody FuncionarioDTO funcionarioDTO){
+    Optional<Colaborador> funcionario = colaboradorRepository.findByCpf(cpf);
     if(funcionario.isEmpty()) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado");
     }
     var funcionarioModel = funcionario.get();
-    BeanUtils.copyProperties(colaboradorRecord, funcionarioModel);
+    BeanUtils.copyProperties(funcionarioDTO, funcionarioModel);
     return ResponseEntity.status(HttpStatus.OK).body(colaboradorRepository.save(funcionarioModel));
   }
 
-  @GetMapping("/{id}/mensagens")
+  @GetMapping("/{cpf}/mensagens")
   public ResponseEntity<Object> all_mensagens(@PathVariable
-   Long id){
-    var colaborador = colaboradorRepository.findById(id);
+   String cpf){
+    var colaborador = colaboradorRepository.findByCpf(cpf);
     if(colaborador.isPresent()){
       return ResponseEntity.status(HttpStatus.OK).body(colaborador.get().getComunicados());
     }
