@@ -30,10 +30,6 @@ public class Funcionario {
   private Atuacao atuacao;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "id_contrato",referencedColumnName = "id")
-  private Contrato contrato;
-
-  @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "id_contato",referencedColumnName = "id")
   private Contato contato;
   @OneToOne(cascade = CascadeType.ALL)
@@ -68,14 +64,6 @@ public class Funcionario {
 
   public void setAtuacao(Atuacao atuacao) {
     this.atuacao = atuacao;
-  }
-
-  public Contrato getContrato() {
-    return contrato;
-  }
-
-  public void setContrato(Contrato contrato) {
-    this.contrato = contrato;
   }
 
   public Contato getContato() {

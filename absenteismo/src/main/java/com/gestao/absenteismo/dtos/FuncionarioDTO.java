@@ -2,7 +2,6 @@ package com.gestao.absenteismo.dtos;
 
 import com.gestao.absenteismo.enums.Atuacao;
 import com.gestao.absenteismo.models.Contato;
-import com.gestao.absenteismo.models.Contrato;
 import com.gestao.absenteismo.models.Endereco;
 
 import jakarta.validation.constraints.NotBlank;
@@ -19,20 +18,17 @@ public class FuncionarioDTO {
   @NotNull
   private Atuacao atuacao;
   @NotNull
-  private Contrato contrato;
-  @NotNull
   private Contato contato;
   @NotNull
   private Endereco endereco;
 
   public FuncionarioDTO() {
   }
-  public FuncionarioDTO(String nome, String cpf, Atuacao atuacao, Contrato contrato, Contato contato,
+  public FuncionarioDTO(String nome, String cpf, Atuacao atuacao, Contato contato,
       Endereco endereco) {
     this.nome = nome;
     this.cpf = cpf;
     this.atuacao = atuacao;
-    this.contrato = contrato;
     this.contato = contato;
     this.endereco = endereco;
   }
@@ -53,12 +49,6 @@ public class FuncionarioDTO {
   }
   public void setAtuacao(Atuacao atuacao) {
     this.atuacao = atuacao;
-  }
-  public Contrato getContrato() {
-    return contrato;
-  }
-  public void setContrato(Contrato contrato) {
-    this.contrato = contrato;
   }
   public Contato getContato() {
     return contato;
