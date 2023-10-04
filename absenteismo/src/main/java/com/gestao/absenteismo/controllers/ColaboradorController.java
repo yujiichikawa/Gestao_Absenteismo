@@ -1,6 +1,5 @@
 package com.gestao.absenteismo.controllers;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
@@ -39,10 +38,6 @@ public class ColaboradorController {
       return ResponseEntity.status(HttpStatus.OK).body("Colaborador removido");
     }
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado");
-  }
-  @GetMapping("/lista")
-  public ResponseEntity<List<Colaborador>> listar_todos(){
-    return ResponseEntity.status(HttpStatus.OK).body(colaboradorRepository.findAll());
   }
 
   @PutMapping("/update/{cpf}")

@@ -71,11 +71,6 @@ public class GestorController {
 
   }
 
-  @GetMapping("/lista")
-  public ResponseEntity<List<Gestor>> listar_todos(){
-    return ResponseEntity.status(HttpStatus.OK).body(gestorRepository.findAll());
-  }
-
   @PutMapping("/update/{cpf}")
   public ResponseEntity<Object> updateById(@PathVariable String cpf,@Valid @RequestBody FuncionarioDTO funcionarioDTO){
     Optional<Gestor> funcionario = gestorRepository.findByCpf(cpf);
@@ -123,5 +118,11 @@ public class GestorController {
     }
     
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Gestor não reconhecido");
+  }
+  
+  @GetMapping("/{cpf}/lista/colaboradores")
+  public ResponseEntity<List<Colaborador>> listar_todos(@PathVariable String cpf){
+    var gestor = gestorRepository.findByCpf(cpf);
+    return ResponseEntity.status(HttpStatus.OK).body(gestor.get().getColaboradores());
   }
 }
