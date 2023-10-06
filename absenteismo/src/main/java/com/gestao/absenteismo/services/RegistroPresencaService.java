@@ -21,4 +21,11 @@ public class RegistroPresencaService {
     presenca.setColaborador(colaborador.get());
     return registroPresencaRepository.save(presenca);
   }
+
+  public Boolean validacao(String cpf){
+    if(!colaboradorRepository.findByCpf(cpf).isPresent()){
+      return false;
+    }
+    return true;
+  }
 }

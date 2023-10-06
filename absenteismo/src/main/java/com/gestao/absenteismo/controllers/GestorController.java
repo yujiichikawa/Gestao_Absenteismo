@@ -1,9 +1,5 @@
 package com.gestao.absenteismo.controllers;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,111 +14,102 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gestao.absenteismo.dtos.ComunicadoDTO;
 import com.gestao.absenteismo.dtos.FuncionarioDTO;
-import com.gestao.absenteismo.models.Colaborador;
-import com.gestao.absenteismo.models.Comunicado;
-import com.gestao.absenteismo.models.Gestor;
-import com.gestao.absenteismo.repositories.ColaboradorRepository;
-import com.gestao.absenteismo.repositories.ComunicadoRepository;
-import com.gestao.absenteismo.repositories.ContatoRepository;
-import com.gestao.absenteismo.repositories.EnderecoRepository;
-import com.gestao.absenteismo.repositories.GestorRepository;
+import com.gestao.absenteismo.services.ColaboradorService;
+import com.gestao.absenteismo.services.ExceptionsServive;
+import com.gestao.absenteismo.services.GestorService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/gestor")
 public class GestorController {
   @Autowired
-  private GestorRepository gestorRepository;
+  private GestorService gestorService;  
   @Autowired
-  private ColaboradorRepository colaboradorRepository;
+  private ExceptionsServive exceptionsServive;
   @Autowired
-  private EnderecoRepository enderecoRepository;
-  @Autowired
-  private ContatoRepository contatoRepository;
-  @Autowired
-  private ComunicadoRepository comunicadoRepository;
+  private ColaboradorService colaboradorService;
 
   @PostMapping("/cadastro")
-  public ResponseEntity<Gestor> cadastro_gestor(@Valid @RequestBody FuncionarioDTO funcionarioDTO){
-    var gestor = new Gestor();
-    BeanUtils.copyProperties(funcionarioDTO, gestor);
-    enderecoRepository.save(gestor.getEndereco());
-    contatoRepository.save(gestor.getContato());
-    return ResponseEntity.status(HttpStatus.CREATED).body(gestorRepository.save(gestor));
+  public ResponseEntity<Object> cadastro_gestor(HttpServletRequest request, @Valid @RequestBody FuncionarioDTO funcionarioDTO){
+    HttpStatus status;
+    if(gestorService.findByGestor(funcionarioDTO.getCpf()).isPresent()){
+      status = HttpStatus.BAD_REQUEST;
+
+      return ResponseEntity.status(status).body(exceptionsServive.create(request, status,"Gestor já existente"));
+    }
+    status = HttpStatus.CREATED;
+    return ResponseEntity.status(status).body(gestorService.cadastro(funcionarioDTO));
   }
 
   @PostMapping("/{cpf}/colaborador/cadastro")
-  public ResponseEntity<Object> cadastro_colaborador(@PathVariable String cpf,@Valid @RequestBody FuncionarioDTO funcionarioDTO){
-    var gestor = gestorRepository.findByCpf(cpf);
+  public ResponseEntity<Object> cadastro_colaborador(HttpServletRequest request, @PathVariable String cpf, @Valid @RequestBody FuncionarioDTO funcionarioDTO){
+    var gestor = gestorService.findByGestor(cpf);
+    HttpStatus status = HttpStatus.BAD_REQUEST;
     if(gestor.isPresent()){
-      var colaborador = new Colaborador();
-      var gestorconvert = gestor.get();
-
-      BeanUtils.copyProperties(funcionarioDTO, colaborador);
-
-      gestorconvert.setColaboradores(colaborador);
-      colaborador.setGestor(gestorconvert);
-      contatoRepository.save(colaborador.getContato());
-      enderecoRepository.save(colaborador.getEndereco());
-      return ResponseEntity.status(HttpStatus.CREATED).body(colaboradorRepository.save(colaborador));
+      if(!colaboradorService.findByColaborador(funcionarioDTO.getCpf()).isPresent()){
+        return ResponseEntity.status(HttpStatus.CREATED).body(colaboradorService.cadastro(funcionarioDTO,gestor.get()));
+      }
+      return ResponseEntity.status(status).body(exceptionsServive.create(request, status,"Colaborador já existente"));
     }
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Gestor não existente");
-
+    return ResponseEntity.status(status).body(exceptionsServive.create(request, status,"Gestor não reconhecido"));
   }
 
   @PutMapping("/update/{cpf}")
-  public ResponseEntity<Object> updateById(@PathVariable String cpf,@Valid @RequestBody FuncionarioDTO funcionarioDTO){
-    Optional<Gestor> funcionario = gestorRepository.findByCpf(cpf);
-    if(funcionario.isEmpty()) {return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado");}
-    var funcionarioModel = funcionario.get();
-    BeanUtils.copyProperties(funcionarioDTO, funcionarioModel);
-    return ResponseEntity.status(HttpStatus.OK).body(gestorRepository.save(funcionarioModel));
+  public ResponseEntity<Object> updateById(HttpServletRequest request, @PathVariable String cpf,@Valid @RequestBody FuncionarioDTO funcionarioDTO){
+    var gestor = gestorService.findByGestor(cpf);
+    HttpStatus status;
+    if(!gestor.isPresent()) {
+      status = HttpStatus.BAD_REQUEST;
+      return ResponseEntity.status(status).body(exceptionsServive.create(request, status,"Gestor não reconhecido"));
+    }
+    status = HttpStatus.OK;
+    return ResponseEntity.status(status).body(gestorService.update(funcionarioDTO,gestor.get()));
   }
 
   @DeleteMapping("/delete/{cpf}")
-  public ResponseEntity<Object> deleteGestor(@PathVariable String cpf){
-    Optional<Gestor> funcionario = gestorRepository.findByCpf(cpf);
-    if(funcionario.isPresent()) {
-      if(funcionario.get().getColaboradores().isEmpty()){
-        gestorRepository.delete(funcionario.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Gerente removido");
+  public ResponseEntity<Object> deleteGestor(HttpServletRequest request, @PathVariable String cpf){
+    var gestor = gestorService.findByGestor(cpf);
+    HttpStatus status;
+    if(gestor.isPresent()) {
+      if(gestor.get().getColaboradores().isEmpty()){
+        status = HttpStatus.OK;
+        gestorService.delete(gestor.get());
+        return ResponseEntity.status(status).body(exceptionsServive.create(request, status, "Gestor foi deletado com sucesso"));
       }
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Gerente com colaboradores");
+      status = HttpStatus.BAD_REQUEST;
+      return ResponseEntity.status(status).body(exceptionsServive.create(request, status, "Gestor com colaboradores"));
     }
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado");
+    status = HttpStatus.BAD_REQUEST;
+    return ResponseEntity.status(status).body(exceptionsServive.create(request, status,"Gestor não reconhecido"));
   } 
 
   @PostMapping("/{cpf_gestor}/mensagem/enviar/{cpf_colaborador}")
-  public ResponseEntity<Object> comunicadoSave(@PathVariable(name = "cpf_gestor") String cpf_gestor,
+  public ResponseEntity<Object> comunicadoSave(HttpServletRequest request, @PathVariable(name = "cpf_gestor") String cpf_gestor,
   @PathVariable(name = "cpf_colaborador") String cpf_colaborador,@Valid @RequestBody ComunicadoDTO comunicadoDTO){
-    Optional<Gestor> geOptional = gestorRepository.findByCpf(cpf_gestor);
+    var geOptional = gestorService.findByGestor(cpf_gestor);
+    HttpStatus status = HttpStatus.NOT_FOUND;
     if(geOptional.isPresent()){
-      Optional<Colaborador> cOptional = colaboradorRepository.findByCpf(cpf_colaborador);
+      var cOptional = colaboradorService.findByColaborador(cpf_colaborador);
       if(cOptional.isPresent()){
-        var gestor = geOptional.get();
-        var comunicado = new Comunicado();
-        var colaborador = cOptional.get();
-        
-        BeanUtils.copyProperties(comunicadoDTO, comunicado);
-
-        gestor.setComunicados(comunicado);
-        colaborador.setComunicados(comunicado);
-        comunicado.setGestor(gestor);
-        comunicado.setColaborador(colaborador);
-        
-        comunicadoRepository.save(comunicado);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Criado");
+        status = HttpStatus.CREATED;
+        return ResponseEntity.status(status).body(gestorService.enviar_comunicado(geOptional.get(), cOptional.get(), comunicadoDTO));
       }
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Colaborador não encontrado");
+      return ResponseEntity.status(status).body(exceptionsServive.create(request, status, "Colaborador não existente"));
     }
-    
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Gestor não reconhecido");
+    return ResponseEntity.status(status).body(exceptionsServive.create(request, status, "Gestor não reconhecido"));
   }
   
   @GetMapping("/{cpf}/lista/colaboradores")
-  public ResponseEntity<List<Colaborador>> listar_todos(@PathVariable String cpf){
-    var gestor = gestorRepository.findByCpf(cpf);
-    return ResponseEntity.status(HttpStatus.OK).body(gestor.get().getColaboradores());
+  public ResponseEntity<?> listar_todos(HttpServletRequest request, @PathVariable String cpf){
+    var gestor = gestorService.findByGestor(cpf);
+    HttpStatus status;
+    if(gestor.isPresent()){
+      status = HttpStatus.OK;
+      return ResponseEntity.status(status).body(gestor.get().getColaboradores());  
+    }
+    status = HttpStatus.BAD_REQUEST;
+    return ResponseEntity.status(status).body(exceptionsServive.create(request, status, "Gestor não reconhecido"));
   }
 }

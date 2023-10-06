@@ -8,6 +8,5 @@ import com.gestao.absenteismo.models.Colaborador;
 
 @Repository
 public interface ColaboradorRepository extends JpaRepository<Colaborador,Long>{
-
   Optional<Colaborador> findByCpf(String cpf);
 }

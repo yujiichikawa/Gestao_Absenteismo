@@ -1,8 +1,5 @@
 package com.gestao.absenteismo.controllers;
 
-import java.util.Optional;
-
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,54 +12,69 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gestao.absenteismo.dtos.FuncionarioDTO;
-import com.gestao.absenteismo.models.Colaborador;
-import com.gestao.absenteismo.models.Registro_Presenca;
-import com.gestao.absenteismo.repositories.ColaboradorRepository;
+import com.gestao.absenteismo.services.ColaboradorService;
+import com.gestao.absenteismo.services.ExceptionsServive;
 import com.gestao.absenteismo.services.RegistroPresencaService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/colaborador")
 public class ColaboradorController {
-  @Autowired
-  private ColaboradorRepository colaboradorRepository;
+
   @Autowired
   private RegistroPresencaService registroPresencaService;
+  @Autowired
+  private ColaboradorService colaboradorService;
+  @Autowired
+  private ExceptionsServive exceptionsServive;
 
   @DeleteMapping("/delete/{cpf}")
-   public ResponseEntity<Object> deleteGestor(@PathVariable String cpf){
-    Optional<Colaborador> funcionario = colaboradorRepository.findByCpf(cpf);
-    if(funcionario.isPresent()) {
-      colaboradorRepository.delete(funcionario.get());
-      return ResponseEntity.status(HttpStatus.OK).body("Colaborador removido");
+   public ResponseEntity<Object> deleteGestor(HttpServletRequest request, @PathVariable String cpf){
+    HttpStatus status;
+    var colaborador = colaboradorService.findByColaborador(cpf);
+    if(colaborador.isPresent()) {
+      status = HttpStatus.OK;
+      colaboradorService.delete(colaborador.get());
+      return ResponseEntity.status(status).body(exceptionsServive.create(request, status, "Colaborador deletado com sucesso"));
     }
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado");
+    status = HttpStatus.NOT_FOUND;
+    return ResponseEntity.status(status).body(exceptionsServive.create(request, status, "Colaborador não encontrado"));
   }
 
   @PutMapping("/update/{cpf}")
-  public ResponseEntity<Object> updateById(@PathVariable String cpf,@Valid @RequestBody FuncionarioDTO funcionarioDTO){
-    Optional<Colaborador> funcionario = colaboradorRepository.findByCpf(cpf);
-    if(funcionario.isEmpty()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado");
+  public ResponseEntity<Object> updateById(HttpServletRequest request, @PathVariable String cpf,@Valid @RequestBody FuncionarioDTO funcionarioDTO){
+    HttpStatus status;
+    var colaborador = colaboradorService.findByColaborador(cpf);
+    if(colaborador.isEmpty()) {
+      status = HttpStatus.NOT_FOUND;
+      return ResponseEntity.status(status).body(exceptionsServive.create(request, status, "Colaborador não reconhecido"));
     }
-    var funcionarioModel = funcionario.get();
-    BeanUtils.copyProperties(funcionarioDTO, funcionarioModel);
-    return ResponseEntity.status(HttpStatus.OK).body(colaboradorRepository.save(funcionarioModel));
+    status = HttpStatus.OK;
+    return ResponseEntity.status(status).body(colaboradorService.update(colaborador.get(),funcionarioDTO));
   }
 
   @GetMapping("/{cpf}/mensagens")
-  public ResponseEntity<Object> all_mensagens(@PathVariable
-   String cpf){
-    var colaborador = colaboradorRepository.findByCpf(cpf);
+  public ResponseEntity<Object> all_mensagens(HttpServletRequest request,@PathVariable String cpf){
+    HttpStatus status;
+    var colaborador = colaboradorService.findByColaborador(cpf);
     if(colaborador.isPresent()){
-      return ResponseEntity.status(HttpStatus.OK).body(colaborador.get().getComunicados());
+      status = HttpStatus.OK;
+      return ResponseEntity.status(status).body(colaborador.get().getComunicados());
     }
-    return ResponseEntity.status(HttpStatus.OK).body("Colaborador nao existente");
+    status = HttpStatus.NOT_FOUND;
+    return ResponseEntity.status(status).body(exceptionsServive.create(request, status, "Colaborador não reconhecido"));
   }
   
   @GetMapping("/presenca/{cpf}")
-  public ResponseEntity<Registro_Presenca> presenca_colaborador(@PathVariable String cpf){  
-    return ResponseEntity.status(HttpStatus.OK).body(registroPresencaService.gerar_presenca_colaborador(cpf));
+  public ResponseEntity<Object> presenca_colaborador(HttpServletRequest request, @PathVariable String cpf){
+    HttpStatus status;
+    if(registroPresencaService.validacao(cpf)){
+      status = HttpStatus.CREATED;
+      return ResponseEntity.status(status).body(registroPresencaService.gerar_presenca_colaborador(cpf));
+    }
+    status = HttpStatus.BAD_REQUEST;
+    return ResponseEntity.status(status).body(exceptionsServive.create(request, status, "Colaborador não reconhecido"));
   }
 }
